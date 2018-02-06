@@ -1,0 +1,178 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+  "height": 400,
+  "padding": 20,
+  "width": 700,
+  "title": {"text": "Threshold Back-tester"},
+  
+  "signals": [
+    {"name": "x", "value": 0},
+    {"name": "x2", "value": 700},
+    {"name": "y", "value": 1},
+    {
+      "name": "dragging",
+      "value": false,
+      "on": [
+        {"events": "@handle:mousedown", "update": "true"},
+        {"events": "mouseup", "update": "false"}
+      ]
+    },
+    {
+      "name": "handleVal",
+      "value": 1,
+      "on": [{
+        "events": "[@handle:mousedown, window:mouseup] > window:mousemove!",
+        "update": "invert('y', clamp(y(), 0, width))"
+      }]
+    },
+    {
+      "name": "currentVal",
+      "update": "clamp(handleVal, -3, 3)"
+    }
+  ],
+  "data": [
+    {
+      "name": "table",
+      "url": "data/thresholds_data.json",
+      "format":{
+        "parse": {"val": "number", "timestamp": "date:'%Y-%m-%d %H:%M:%S'"}
+      },
+      "transform": [
+        {"type": "extent", "field": "timestamp", "signal": "dates"}
+      ]
+    },
+    {
+      "name": "lower",
+      "source": "table",
+      "transform": [
+        {"type": "filter", "expr": "datum.val < currentVal"}
+      ]
+    }
+  ],
+ 
+  "scales": [
+    {
+      "range": "width",
+      "type": "time",
+      "name": "x",
+      "domain": {
+        "field": "timestamp",
+        "data": "table"
+      },
+      "nice":"hour"
+    },
+    {
+      "domain": {
+        "field": "val",
+        "data": "table"
+      },
+      "name": "y",
+      "zero": true,
+      "range": "height",
+      "type": "linear",
+      "nice": true
+    }
+  ],
+  
+  "axes": [
+    {
+      "scale": "x",
+      "orient": "bottom"
+    },
+    {
+      "scale": "y",
+      "orient": "left"
+    }
+  ],
+
+  "marks": [
+    {
+      "encode": {
+        "enter": {
+          "y": {
+            "field": "val",
+            "scale": "y"
+          },
+          "x": {
+            "field": "timestamp",
+            "scale": "x"
+          },
+          "interpolate": {
+            "value": "monotone"
+          },
+          "stroke":{"value":"#74b9ff"}
+        }
+      },
+      "from": {
+        "data": "table"
+      },
+      "type": "line"
+    },
+    {
+      "encode": {
+        "enter": {
+          "y": {
+            "field": "val",
+            "scale": "y"
+          },
+          "x": {
+            "field": "timestamp",
+            "scale": "x"
+          },
+          "fill": {"value": "#e74c3c"},
+          "opacity": {"value":0.7}
+        }
+      },
+      "from": {
+        "data": "lower"
+      },
+      "type": "symbol"
+    },
+    {
+      "type": "text",
+      "encode":{
+        "update": {
+          "text": {"signal": "currentVal"},
+          "baseline": {"value": "middle"},
+          "x":{"signal": "format(x2 + 10, ',.2f')"},
+          "y": {"scale": "y", "signal": "currentVal"}
+        }
+      }
+    },
+    {
+      "type": "rule",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "x2": {"signal": "x2"},
+          "stroke": {"value": "#000"},
+          "strokeWidth": {"value": 2}
+        },
+        "update": {
+          "y": {"scale": "y", "signal": "currentVal"}
+        }
+      }
+    },
+    {
+      "name": "handle",
+      "type": "symbol",
+      "encode": {
+        "enter": {
+          "x": {"signal": "x2"},
+          "shape": {"value": "triangle-left"},
+          "size": {"value": 200},
+          "stroke": {"value": "#000"},
+          "strokeWidth": {"value": 1}
+        },
+        "update": {
+          "y": {"scale": "y", "signal": "currentVal"},
+          "fill": {"value": "white"}
+        },
+        "hover": {
+          "fill": {"value": "white"},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    }
+  ]
+}

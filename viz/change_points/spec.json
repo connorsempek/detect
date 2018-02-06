@@ -1,0 +1,154 @@
+{
+  "$schema": "https://vega.github.io/schema/vega/v3.0.json",
+  "height": 400,
+  "padding": 5,
+  "width": 700,
+  
+  "signals": [
+    { 
+      "name": "window1", 
+      "value": 6,
+      "bind": {
+        "input": "range", 
+        "min":6, 
+        "max": 60, 
+        "step": 6
+      } 
+    },
+    { 
+      "name": "window2", 
+      "value": 6,
+      "bind": {
+        "input": "range", 
+        "min":6, 
+        "max": 60, 
+        "step": 6
+      }
+    }
+  ],
+
+  "data": [
+    {
+      "name": "table",
+      "url": "data/change_points_data.json",
+      "format":{
+        "parse": {"ma": "number", "hr": "date:'%Y-%m-%d %H:%M:%S'"}
+      }
+    },
+    {
+      "name": "windows1",
+      "source": "table",
+      "transform": [
+        {"type": "filter", "expr": "datum.window == window1"}
+      ]
+    },
+    {
+      "name": "windows2",
+      "source": "table",
+      "transform": [
+        {"type": "filter", "expr": "datum.window == window2"}
+      ]
+    },
+    {
+      "name": "ma1",
+      "source": "windows1",
+      "transform": [
+        {"type": "filter", "expr": "datum.ma_id == 1"}
+      ]
+    },
+    {
+      "name": "ma2",
+      "source": "windows2",
+      "transform": [
+        {"type": "filter", "expr": "datum.ma_id == 2"}
+      ]
+    }
+  ],
+ 
+  "scales": [
+    {
+      "range": "width",
+      "type": "time",
+      "name": "x",
+      "domain": {
+        "field": "hr",
+        "data": "table"
+      },
+      "nice":"hour"
+    },
+    {
+      "domain": {
+        "field": "ma",
+        "data": "table"
+      },
+      "name": "y",
+      "zero": true,
+      "range": "height",
+      "type": "linear",
+      "nice": true
+    },
+    {
+      "name": "c",
+      "type": "ordinal",
+      "domain": [1, 2],
+      "range": ["#5352ed", "#ff6348"]
+    }
+  ],
+  
+  "axes": [
+    {
+      "scale": "x",
+      "orient": "bottom"
+    },
+    {
+      "scale": "y",
+      "orient": "left"
+    }
+  ],
+
+  "marks": [
+    {
+      "encode": {
+        "enter": {
+          "y": {
+            "field": "ma",
+            "scale": "y"
+          },
+          "x": {
+            "field": "hr",
+            "scale": "x"
+          },
+          "interpolate": {
+            "value": "monotone"
+          }
+        }
+      },
+      "from": {
+        "data": "ma1"
+      },
+      "type": "line"
+    },
+    {
+      "encode": {
+        "enter": {
+          "y": {
+            "field": "ma",
+            "scale": "y"
+          },
+          "x": {
+            "field": "hr",
+            "scale": "x"
+          },
+          "interpolate": {
+            "value": "monotone"
+          },
+          "stroke":{"scale":"c", "field":"ma_id"}
+        }
+      },
+      "from": {
+        "data": "ma2"
+      },
+      "type": "line"
+    }
+  ]
+}
