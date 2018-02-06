@@ -13,23 +13,37 @@
       "name": "dragging",
       "value": false,
       "on": [
-        {"events": "@handle:mousedown", "update": "true"},
+        {"events": "@lowerHandle:mousedown", "update": "true"},
+        {"events": "@upperHandle:mousedown", "update": "true"},
         {"events": "mouseup", "update": "false"}
       ]
     },
     {
-      "name": "handleVal",
-      "value": 1,
+      "name": "lowerHandleVal",
+      "value": -1,
       "on": [{
-        "events": "[@handle:mousedown, window:mouseup] > window:mousemove!",
+        "events": "[@lowerHandle:mousedown, window:mouseup] > window:mousemove!",
         "update": "invert('y', clamp(y(), 0, width))"
       }]
     },
     {
-      "name": "currentVal",
-      "update": "clamp(handleVal, -3, 3)"
+      "name": "upperHandleVal",
+      "value": 1,
+      "on": [{
+        "events": "[@upperHandle:mousedown, window:mouseup] > window:mousemove!",
+        "update": "invert('y', clamp(y(), 0, width))"
+      }]
+    },
+    {
+      "name": "lowerCurrentVal",
+      "update": "clamp(lowerHandleVal, -3, -0.1)"
+    },
+    {
+      "name": "upperCurrentVal",
+      "update": "clamp(upperHandleVal, 0.1, 3)"
     }
   ],
+
   "data": [
     {
       "name": "table",
@@ -45,7 +59,14 @@
       "name": "lower",
       "source": "table",
       "transform": [
-        {"type": "filter", "expr": "datum.val < currentVal"}
+        {"type": "filter", "expr": "datum.val < lowerCurrentVal"}
+      ]
+    },
+    {
+      "name": "upper",
+      "source": "table",
+      "transform": [
+        {"type": "filter", "expr": "datum.val > upperCurrentVal"}
       ]
     }
   ],
@@ -129,13 +150,46 @@
       "type": "symbol"
     },
     {
+      "encode": {
+        "enter": {
+          "y": {
+            "field": "val",
+            "scale": "y"
+          },
+          "x": {
+            "field": "timestamp",
+            "scale": "x"
+          },
+          "fill": {"value": "#e74c3c"},
+          "opacity": {"value":0.7}
+        }
+      },
+      "from": {
+        "data": "upper"
+      },
+      "type": "symbol"
+    },
+    {
       "type": "text",
       "encode":{
         "update": {
-          "text": {"signal": "currentVal"},
+          "text": {"signal": "format(upperCurrentVal, ',.2f')"},
           "baseline": {"value": "middle"},
-          "x":{"signal": "format(x2 + 10, ',.2f')"},
-          "y": {"scale": "y", "signal": "currentVal"}
+          "x":{"signal": "x2 + 20"},
+          "y": {"scale": "y", "signal": "upperCurrentVal"},
+          "fontSize": {"value": 14}
+        }
+      }
+    },
+    {
+      "type": "text",
+      "encode":{
+        "update": {
+          "text": {"signal": "format(lowerCurrentVal, ',.2f')"},
+          "baseline": {"value": "middle"},
+          "x":{"signal": "x2 + 20"},
+          "y": {"scale": "y", "signal": "lowerCurrentVal"},
+          "fontSize": {"value": 14}
         }
       }
     },
@@ -144,28 +198,65 @@
       "encode": {
         "enter": {
           "x": {"value": 0},
-          "x2": {"signal": "x2"},
+          "x2": {"signal": "x2 + 10"},
           "stroke": {"value": "#000"},
-          "strokeWidth": {"value": 2}
+          "strokeWidth": {"value": 1.5},
+          "strokeDash": {"value": [8,8]}
         },
         "update": {
-          "y": {"scale": "y", "signal": "currentVal"}
+          "y": {"scale": "y", "signal": "lowerCurrentVal"}
         }
       }
     },
     {
-      "name": "handle",
+      "name": "lowerHandle",
       "type": "symbol",
       "encode": {
         "enter": {
-          "x": {"signal": "x2"},
+          "x": {"signal": "x2 + 10"},
           "shape": {"value": "triangle-left"},
           "size": {"value": 200},
           "stroke": {"value": "#000"},
           "strokeWidth": {"value": 1}
         },
         "update": {
-          "y": {"scale": "y", "signal": "currentVal"},
+          "y": {"scale": "y", "signal": "lowerCurrentVal"},
+          "fill": {"value": "white"}
+        },
+        "hover": {
+          "fill": {"value": "white"},
+          "cursor": {"value": "pointer"}
+        }
+      }
+    },
+    {
+      "type": "rule",
+      "encode": {
+        "enter": {
+          "x": {"value": 0},
+          "x2": {"signal": "x2 + 10"},
+          "stroke": {"value": "#000"},
+          "strokeWidth": {"value": 1.5},
+          "strokeDash": {"value": [8,8]}
+        },
+        "update": {
+          "y": {"scale": "y", "signal": "upperCurrentVal"}
+        }
+      }
+    },
+    {
+      "name": "upperHandle",
+      "type": "symbol",
+      "encode": {
+        "enter": {
+          "x": {"signal": "x2 + 10"},
+          "shape": {"value": "triangle-left"},
+          "size": {"value": 200},
+          "stroke": {"value": "#000"},
+          "strokeWidth": {"value": 1}
+        },
+        "update": {
+          "y": {"scale": "y", "signal": "upperCurrentVal"},
           "fill": {"value": "white"}
         },
         "hover": {
