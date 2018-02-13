@@ -30,9 +30,21 @@
   "data": [
     {
       "name": "table",
-      "url": "data/change_points_data.json",
+      "url": "data/rolling_means_data.json",
       "format":{
         "parse": {"ma": "number", "hr": "date:'%Y-%m-%d %H:%M:%S'"}
+      }
+    },
+    {
+      "name": "cps",
+      "url": "data/change_points_data.json",
+      "format":{
+        "parse": {
+          "val": "number",
+          "ma_1": "number", 
+          "ma_2": "number", 
+          "hr": "date:'%Y-%m-%d %H:%M:%S'"
+        }
       }
     },
     {
@@ -62,6 +74,16 @@
       "transform": [
         {"type": "filter", "expr": "datum.ma_id == 2"}
       ]
+    },
+    {
+      "name": "cp",
+      "source": "cps",
+      "transform": [
+        {
+          "type": "filter", 
+          "expr": "(datum.window_1 == window1) && (datum.window_2 == window2)"
+        }
+      ]
     }
   ],
  
@@ -88,10 +110,15 @@
       "nice": true
     },
     {
-      "name": "c",
-      "type": "ordinal",
-      "domain": [1, 2],
-      "range": ["#5352ed", "#ff6348"]
+      "domain": {
+        "field": "val",
+        "data": "cps"
+      },
+      "name": "y1",
+      "zero": true,
+      "range": "height",
+      "type": "linear",
+      "nice": true
     }
   ],
   
@@ -120,7 +147,8 @@
           },
           "interpolate": {
             "value": "monotone"
-          }
+          },
+          "stroke": {"value":"#58E5A8"}
         }
       },
       "from": {
@@ -142,13 +170,31 @@
           "interpolate": {
             "value": "monotone"
           },
-          "stroke":{"scale":"c", "field":"ma_id"}
+          "stroke": {"value": "#D473F3"}
         }
       },
       "from": {
         "data": "ma2"
       },
       "type": "line"
+    },
+    {
+      "encode": {
+        "enter": {
+          "y": {
+            "field": "val",
+            "scale": "y1"
+          },
+          "x": {
+            "field": "hr",
+            "scale": "x"
+          }
+        }
+      },
+      "from": {
+        "data": "cp"
+      },
+      "type": "symbol"
     }
   ]
 }
