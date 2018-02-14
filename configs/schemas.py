@@ -1,7 +1,6 @@
-from openmail_common import 
+# detect config schema definitions
 
-
-DATA = {
+DATA_SOURCES = {
 
 	'csv': {
 		'parameters': {
@@ -19,7 +18,7 @@ DATA = {
 		'parameters': {
 			'sql': {'type': [str]},
 			'db': {'type':[str]},
-		},
+		}
 	}
 }
 
@@ -56,9 +55,37 @@ DETECT_TYPES = {
 
 		}
 	}
-} 
+}
 
 
+NOTIFY_TYPES = {
+	
+	'email': {
+		'parameters': {
+			'recipients': {'type': list},
+		}
+	}
+	# TODO: Add slack channel option
+}
+
+
+CONFIG = {
+
+	'name': {'type': [str], 'required': True},
+	'detect_type': {'type': [dict], 'required': True},
+	'data': {
+		'source': {'type': [dict], 'required': True},
+		'time_col': {'type': [str], 'required': True},
+		'metric_col': {'type': [str],'required': True},
+		'required': True
+	},
+	'look_back': {
+		'type':[int], 
+		'default': 1,
+		'required': False
+	}
+	'notify': {'type': [dict], 'required': True}
+}
 
 
 
