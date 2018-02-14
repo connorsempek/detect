@@ -1,6 +1,6 @@
 # detect config schema definitions
 
-DATA_SOURCES = {
+DATA_SOURCE = {
 
 	'csv': {
 		'parameters': {
@@ -23,7 +23,7 @@ DATA_SOURCES = {
 }
 
 
-DETECT_TYPES = {
+DETECT_TYPE = {
 	
 	# ********** THRESHOLD **********
 	'threshold': {
@@ -57,15 +57,21 @@ DETECT_TYPES = {
 	}
 }
 
-
-NOTIFY_TYPES = {
+# TODO: need to create message bodies to populate slack and email notifications
+NOTIFY_TYPE = {
 	
 	'email': {
 		'parameters': {
-			'recipients': {'type': list},
+			'recipients': {'type': list, 'required': True},
 		}
 	}
-	# TODO: Add slack channel option
+	# TODO: Add slack bot alerting
+	'slack': {
+		'parameters': {
+			'channel': {'type': str, 'required': True},
+			'name': {'type': str, 'required': True}
+		}
+	}
 }
 
 
@@ -86,13 +92,4 @@ CONFIG = {
 	}
 	'notify': {'type': [dict], 'required': True}
 }
-
-
-
-
-
-
-
-
-
 
