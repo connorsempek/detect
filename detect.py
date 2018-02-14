@@ -1,6 +1,11 @@
+# code for simple anomaly/trend/outlier detection in timeseries data
+
+# imports
 import numpy as np
 import pandas as pd
 
+
+# ********** Threshold **********
 
 def threshold(ts, lower=None, upper=None):
     '''detect when a threshold is crossed above or below
@@ -31,17 +36,30 @@ def threshold(ts, lower=None, upper=None):
 
 def threshold_alert(ts, lower, upper, between=False, look_back=1):
     '''determine if threshold criteria warrant alerting
+
+    Parameters
+    ----------
+    ts    : 
+    lower :
+    upper :
+
     '''
     
-    low, high, mid = threshold(ts, lower=LOWER, upper=UPPER)
+    low, high, mid = detect.threshold(ts, lower=LOWER, upper=UPPER)
 
-    # check if values in lookback period warrant alerts
-    alert_low = low.iloc[-look_back:].sum() > 0
-    alert_high = high.iloc[-look_back:].sum() > 0
-    alert_mid = mid.iloc[-look_back:].sum() > 0
+    # check if values in lookback meet threshold criteria
+    alert_low = low.iloc[-LOOK_BACK:].sum() > 0
+    alert_high = high.iloc[-LOOK_BACK:].sum() > 0
+    alert_mid = mid.iloc[-LOOK_BACK:].sum() > 0
+    
+    if between:
+        res = alert_mid
+    else:
+        res = alert_low or alert_high
+    return res
 
-    return alert_low, alert_high, alert_mid
 
+# ********** Change Points **********
 
 def trend_seq_label(x, step):
     '''
