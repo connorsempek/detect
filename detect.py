@@ -22,11 +22,25 @@ def threshold(ts, lower=None, upper=None):
     
     if lower is None:
         lower = -np.inf
-        
+
     if upper is None:
         upper = np.inf
 
     return ts < lower, ts > upper, (ts >= lower) & (ts <= upper) 
+
+
+def threshold_alert(ts, lower, upper, between=False, look_back=1):
+    '''determine if threshold criteria warrant alerting
+    '''
+    
+    low, high, mid = threshold(ts, lower=LOWER, upper=UPPER)
+
+    # check if values in lookback period warrant alerts
+    alert_low = low.iloc[-LOOK_BACK:].sum() > 0
+    alert_high = high.iloc[-LOOK_BACK:].sum() > 0
+    alert_mid = mid.iloc[-LOOK_BACK:].sum() > 0
+
+    return alert_low, alert_high, alert_mid
 
 
 def trend_seq_label(x, step):
