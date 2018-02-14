@@ -36,9 +36,9 @@ def threshold_alert(ts, lower, upper, between=False, look_back=1):
     low, high, mid = threshold(ts, lower=LOWER, upper=UPPER)
 
     # check if values in lookback period warrant alerts
-    alert_low = low.iloc[-LOOK_BACK:].sum() > 0
-    alert_high = high.iloc[-LOOK_BACK:].sum() > 0
-    alert_mid = mid.iloc[-LOOK_BACK:].sum() > 0
+    alert_low = low.iloc[-look_back:].sum() > 0
+    alert_high = high.iloc[-look_back:].sum() > 0
+    alert_mid = mid.iloc[-look_back:].sum() > 0
 
     return alert_low, alert_high, alert_mid
 
