@@ -1,39 +1,65 @@
+# code for simple anomaly/trend/outlier detection in timeseries data
+
+# imports
 import numpy as np
 import pandas as pd
 
 
-def threshhold(ts, bound, where='below'):
-    '''detect when a threshhold is crossed above or below
+# ********** Threshold **********
+
+def threshold(ts, lower=None, upper=None):
+    '''detect when a threshold is crossed above or below
     
     Parameters
     ----------
     ts         : Pandas Series or DataFrame with datetime index
-    bound      : threshhold value to compare values of the timeseries against
-                 and mark when the values are above and/or below the threshhold.
-                 If a length 2 list or tuple is passed, then defaults to checking 
-                 if values are below `bound[0]` and above `bound[1]`. Otherwise, compares
-                 above or below based on `when` parameter.
-    where      : values allowed are `below`, `above`, `both`. If `below`, then check where
-                 values of `ts` are below `bound`, and if `above` then check where values of
-                 `ts` are above `bound`. Defaults to `below`.
+    lower      : lower threshold value
+    upper      : upper threshold value
            
     Returns
     -------
-    A DataFrame with matching index to input `ts` with two boolean columns, `below` and `above`,
-    which index values below and above input threshhold bound, respectively.
+    A tuple of boolean series low, high, and mid where low contains all points
+    in ts whose values are < lower, high contains all points in ts whose 
+    values are > upper and mid contains all points in ts whose values are
+    between lower and upper inclusive. All have the same datetime index as the
+    input series.
     '''
     
-    if isinstance(bound, (tuple, list)):
-        # TODO: add error handling for if input is not length 2
-        # Should probably create a tuple (b, inf) or (-inf, b)
-        lower, upper = tuple(bound)
-    else:
-        if where == 'below':
-            lower, upper = bound, np.inf
-        elif where == 'above':
-            lower, upper = -np.inf, bound
-    return ts < lower, ts > upper
+    if lower is None:
+        lower = -np.inf
 
+    if upper is None:
+        upper = np.inf
+
+    return ts < lower, ts > upper, (ts >= lower) & (ts <= upper) 
+
+
+def threshold_alert(ts, lower, upper, between=False, look_back=1):
+    '''determine if threshold criteria warrant alerting
+
+    Parameters
+    ----------
+    ts    : 
+    lower :
+    upper :
+
+    '''
+    
+    low, high, mid = detect.threshold(ts, lower=LOWER, upper=UPPER)
+
+    # check if values in lookback meet threshold criteria
+    alert_low = low.iloc[-LOOK_BACK:].sum() > 0
+    alert_high = high.iloc[-LOOK_BACK:].sum() > 0
+    alert_mid = mid.iloc[-LOOK_BACK:].sum() > 0
+    
+    if between:
+        res = alert_mid
+    else:
+        res = alert_low or alert_high
+    return res
+
+
+# ********** Change Points **********
 
 def trend_seq_label(x, step):
     '''
@@ -86,7 +112,7 @@ def trend_runs(ts, step=0, signed=False):
 
 
 def variance_band(ts, radius=1, method='stdev', window=None, auto_window=True):
-    '''computes a threshhold timeseries based on variance of previous window
+    '''computes a threshold timeseries based on variance of previous window
     
     Parameters
     ----------
