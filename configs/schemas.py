@@ -1,23 +1,23 @@
 # detect config schema definitions
 
-DATA_SOURCE = {
+DATA_TYPE = {
 
 	'csv': {
 		'parameters': {
-			'fp': {'type': [str]}
+			'fp': {'type': [str], 'required':True}
 		}
 	},
 
 	's3': {
 		'parameters': {
-			'url': {'type': [str]}
+			'url': {'type': [str], 'required':True}
 		}
 	},
 
 	'query': {
 		'parameters': {
-			'sql': {'type': [str]},
-			'db': {'type':[str]},
+			'sql': {'type': [str], 'required':True},
+			'db': {'type':[str], 'required':True},
 		}
 	}
 }
@@ -25,7 +25,6 @@ DATA_SOURCE = {
 
 DETECT_TYPE = {
 	
-	# ********** THRESHOLD **********
 	'threshold': {
 		'parameters': {
 
@@ -52,12 +51,11 @@ DETECT_TYPE = {
 				'required': False,
 				'default': 1
 			}
-
 		}
 	}
 }
 
-# TODO: need to create message bodies to populate slack and email notifications
+# TODO: add functionality to support these types :)
 NOTIFY_TYPE = {
 	
 	'email': {
@@ -65,31 +63,31 @@ NOTIFY_TYPE = {
 			'recipients': {'type': list, 'required': True},
 		}
 	}
-	# TODO: Add slack bot alerting
 	'slack': {
 		'parameters': {
 			'channel': {'type': str, 'required': True},
 			'name': {'type': str, 'required': True}
 		}
 	}
+	'jira': {
+		'parameters': {
+			'key': {'type': str, 'required': True},
+			'user': {'type': str, 'required': True}
+		}
+	}
 }
 
 
 CONFIG = {
-
 	'name': {'type': [str], 'required': True},
-	'detect_type': {'type': [dict], 'required': True},
-	'data': {
-		'source': {'type': [dict], 'required': True},
-		'time_col': {'type': [str], 'required': True},
-		'metric_col': {'type': [str],'required': True},
-		'required': True
-	},
-	'look_back': {
-		'type':[int], 
-		'default': 1,
-		'required': False
-	}
+	'detect': {'type': [dict], 'required': True},
+	'data': {'type': [dict], 'required': True},
+
+	# should move time_col and measure_col to DATA_TYPE schema
+	'time_col': {'type': [str], 'required': True},
+	'measure_col': {'type': [str], 'required': True},
+	
+	'look_back': {'type':[int], 'default': 1, 'required': False},
 	'notify': {'type': [dict], 'required': True}
 }
 
