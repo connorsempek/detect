@@ -62,13 +62,13 @@ NOTIFY_TYPE = {
 		'parameters': {
 			'recipients': {'type': list, 'required': True},
 		}
-	}
+	},
 	'slack': {
 		'parameters': {
 			'channel': {'type': str, 'required': True},
 			'name': {'type': str, 'required': True}
 		}
-	}
+	},
 	'jira': {
 		'parameters': {
 			'key': {'type': str, 'required': True},
