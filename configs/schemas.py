@@ -88,6 +88,6 @@ CONFIG = {
 	'measure_col': {'type': [str], 'required': True},
 	
 	'look_back': {'type':[int], 'default': 1, 'required': False},
-	'notify': {'type': [dict], 'required': True}
+	'notify': {'type': [dict], 'required': False}
 }
 
