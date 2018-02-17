@@ -22,10 +22,11 @@ def validate_object(obj, schema):
 
 	valid_types = set(schema.keys())
 
-	# check that there is only one key
-	assert len(obj) == 1
+	# check that there is only one key it object is not of CONFIG type
+	if 'name' not in obj:
+		assert len(obj) == 1
 
-	# check that the data source key is defined in DATA_SOURCE schema
+	# check that the data source key is defined in DATA_TYPE schema
 	name = obj.keys()[0]
 	assert name in valid_types 
 
