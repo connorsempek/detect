@@ -1,0 +1,9 @@
+name: threshold_test
+detect:
+    threshold:
+      lower: -1
+      upper: 1
+data:
+  csv:
+    fp: "../viz/data/lines_data.csv"
+
