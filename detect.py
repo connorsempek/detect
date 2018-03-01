@@ -39,25 +39,30 @@ def threshold_alert(ts, lower, upper, between=False, look_back=1):
 
     Parameters
     ----------
-    ts    : 
-    lower :
-    upper :
+    ts        : 
+    lower     :
+    upper     :
+    between   :
+    look_back :
+
+    Returns
+    -------
 
     '''
     
-    low, high, mid = detect.threshold(ts, lower=LOWER, upper=UPPER)
+    low, high, mid = threshold(ts, lower=lower, upper=upper)
 
     # check if values in lookback meet threshold criteria
-    alert_low = low.iloc[-LOOK_BACK:].sum() > 0
-    alert_high = high.iloc[-LOOK_BACK:].sum() > 0
-    alert_mid = mid.iloc[-LOOK_BACK:].sum() > 0
+    alert_low = low.iloc[-look_back:].sum() > 0
+    alert_high = high.iloc[-look_back:].sum() > 0
+    alert_mid = mid.iloc[-look_back:].sum() > 0
     
     if between:
         res = alert_mid
     else:
-        res = alert_low or alert_high
+        res = alert_low | alert_high
     return res
-
+    
 
 # ********** Change Points **********
 
