@@ -4,6 +4,11 @@ def make_spec(df, lower, upper, between, look_back, time_col, measure_col,
   '''
   '''
 
+  lower_ct = (df[measure_col] < lower).sum()
+  lower_pct = 1.0 * lower_ct / df.shape[0]
+  upper_ct = (df[measure_col] > upper).sum()
+  upper_pct = 1.0 * upper_ct / df.shape[0]
+
   spec = {
     "$schema": "https://vega.github.io/schema/vega/v3.0.json",
     "height": 400,
@@ -204,10 +209,22 @@ def make_spec(df, lower, upper, between, look_back, time_col, measure_col,
         "type": "text",
         "encode":{
           "update": {
-            "text": {"value": "hey"},
+            "text": {"value": "{} ({:.0%})".format(upper_ct, upper_pct)},
             "baseline": {"value": "middle"},
             "x":{"signal": "x2 + 20"},
             "y": {"scale": "y", "signal": "upper_annot"},
+            "fontSize": {"value": 14}
+          }
+        }
+      },
+      {
+        "type": "text",
+        "encode":{
+          "update": {
+            "text": {"value": "{}  ({:.0%})".format(lower_ct, lower_pct)},
+            "baseline": {"value": "middle"},
+            "x":{"signal": "x2 + 20"},
+            "y": {"scale": "y", "signal": "lower_annot"},
             "fontSize": {"value": 14}
           }
         }
